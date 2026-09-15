@@ -1,0 +1,89 @@
+# MISTAKES.md
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  MISTAKES — Memory of failure, for agents and humans        ║
+  ║                                                            ║
+  ║  Agents: Read before any risky action.                      ║
+  ║  Humans: Append when something goes wrong.                  ║
+  ║                                                            ║
+  ║  Newest entries go FIRST. Never rewrite history — append. ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+<!--
+  ENTRY FORMAT (every entry needs all four fields):
+
+  - What happened: Concrete description. Name files, commands, ports. No euphemism.
+  - Root cause:    Why it happened. The assumption, the skipped check, the misread.
+  - Consequence:   What it cost. Data loss, wasted time, shipped falsehood, correction.
+  - The rule:      The check that prevents a repeat. An instruction, not a wish.
+
+  TWO STYLES — pick one per file, stay consistent:
+
+  A) Single-line (compact, greppable) — good for most repos:
+     YYYY-MM-DD - What happened | Root cause | Consequence | The rule
+
+  B) Sectioned (postmortem) — good for failures worth explaining:
+     ## YYYY-MM-DD — Short title
+     **What happened:** ...
+     **Root cause:** ...
+     **Consequence:** ...
+     **The rule:** ...
+
+  RULES FOR ENTRIES:
+  1. Newest first. The top of the file is the most recent failure.
+  2. Never edit or delete old entries. They are history. Correct by appending.
+  3. Name the mechanism, not just the symptom. "Checked the wrong asset" beats "was confused".
+  4. The rule must be checkable. "Verify X before Y" beats "be more careful".
+  5. If no mistakes yet, keep the placeholder below so agents know the file is live.
+-->
+
+---
+
+## Entries
+
+*(No mistakes logged yet)*
+
+<!--
+  EXAMPLE A — single-line (delete after replacing with your own):
+
+  2026-09-03 - Drove the dev camera to z=+6 and read the black wedges as a rendering defect | The player clamp is ROOM_START_Z - 0.6, so z=+6 is inside the entrance wall and __shop.goto bypasses the clamp | Nearly spent a fix on a view no visitor can reach | Check a diagnostic camera position against the movement clamp before treating what it shows as a defect
+
+  2026-08-23 - Moved the exit control off the cabinet but anchored it to the right edge, checked at one viewport | The correction was verified at one constrained width instead of both reported browser widths | The button landed offscreen in the user's wider browser | Keep essential escape controls on the known-clear margin and verify every reported viewport before presenting the fix
+
+  EXAMPLE B — sectioned (delete after replacing with your own):
+
+  ## 2026-09-13 — A validator held a false sentence in place
+
+  **What happened:** platforms/codex/README.md asserted "Sol / High runs the show", and plugins/sol-advisor/scripts/verify.sh enforced that exact string. The repo ships three chair aliases, so the sentence is false under two of them.
+
+  **Root cause:** the check grepped for a specific chair's name when the rule it meant to protect was that some chair owns architecture, verification, escalation and acceptance. The validator stopped protecting the rule and started protecting the error.
+
+  **Consequence:** a false ownership claim shipped in a public README and survived seven review rounds, guarded by a check that made it look deliberate.
+
+  **The rule:** a phrase-matching check must grep the invariant, never an instance of it. Before adding one, ask what the repo would have to do for the phrase to become false without the rule becoming false.
+-->
+
+---
+
+## Key Rules
+
+<!--
+  Rules every agent must follow. These are the guardrails that make the ledger work.
+  Add project-specific rules as needed.
+-->
+
+1. **Read this file before any risky action.** If a past entry covers this area, follow its rule.
+2. **Append when you err.** New entry at the top. All four fields. Date it.
+3. **Never rewrite history.** Don't edit or delete old entries to look better. Correct by appending.
+4. **Write the rule as an instruction.** "Verify X before Y" — something the next agent can execute.
+5. **One MISTAKES.md per scope.** A single file in `~/.config/agent-rules/` covers cross-project failures. Per-project copies cover failures specific to that repo.
+
+---
+
+## Maintenance
+
+- **Frequency:** Append whenever a mistake happens. Don't batch them.
+- **Audit:** Skim the top 5 entries at session start for high-risk work (deploys, migrations, deletes).
+- **Stale entries:** Don't delete them. If a rule no longer applies, append a superseding entry that says so.
