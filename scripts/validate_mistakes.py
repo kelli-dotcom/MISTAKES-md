@@ -33,11 +33,12 @@ SINGLE_LINE_FIELDS = ["What happened", "Root cause", "Consequence", "The rule"]
 HTML_COMMENT_RE = re.compile(r"<!--[\s\S]*?-->")
 ENTRIES_HEADING_RE = re.compile(r"^##\s+Entries\s*$", re.IGNORECASE)
 ANY_H2_RE = re.compile(r"^##\s+")
-DATE_H2_PREFIX_RE = re.compile(r"^##\s+\d{4}-\d{2}-\d{2}\b")
+DATE_LIKE = r"\d{4}-\d{1,2}-\d{1,2}"
+DATE_H2_PREFIX_RE = re.compile(rf"^##\s+{DATE_LIKE}\b")
 PLACEHOLDER_RE = re.compile(r"^\*?\(?\s*No mistakes logged yet\s*\)?\*?$", re.IGNORECASE)
-SECTION_ENTRY_RE = re.compile(r"^##\s+(\d{4}-\d{2}-\d{2})(?:\s+(?:—|--|-|–)\s+(.*)|\s+(.*))?$")
-SINGLE_LINE_ENTRY_RE = re.compile(r"^(?:-\s+)?(\d{4}-\d{2}-\d{2})\s+(?:—|--|-|–)\s+(.+)$")
-DATE_LINE_PREFIX_RE = re.compile(r"^(?:-\s+)?\d{4}-\d{2}-\d{2}\b")
+SECTION_ENTRY_RE = re.compile(rf"^##\s+({DATE_LIKE})(?:\s+(?:—|--|-|–)\s+(.*)|\s+(.*))?$")
+SINGLE_LINE_ENTRY_RE = re.compile(rf"^(?:-\s+)?({DATE_LIKE})\s+(?:—|--|-|–)\s+(.+)$")
+DATE_LINE_PREFIX_RE = re.compile(rf"^(?:-\s+)?{DATE_LIKE}\b")
 
 
 def strip_html_comments_preserve_lines(markdown: str) -> str:
@@ -117,7 +118,11 @@ def validate_mistakes_markdown(raw_content: str, file_path: str = "MISTAKES.md")
 
             while j < end_idx:
                 next_trimmed = lines[j].strip()
-                if ANY_H2_RE.match(next_trimmed) or re.fullmatch(r"-{3,}", next_trimmed):
+                if (
+                    ANY_H2_RE.match(next_trimmed)
+                    or DATE_LINE_PREFIX_RE.match(next_trimmed)
+                    or re.fullmatch(r"-{3,}", next_trimmed)
+                ):
                     break
 
                 matched_field = False

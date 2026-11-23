@@ -96,6 +96,36 @@ class ValidateMistakesTests(unittest.TestCase):
         self.assertFalse(result["valid"])
         self.assertTrue(any("Mixed entry styles" in e["message"] for e in result["errors"]))
 
+    def test_detects_single_line_entry_after_sectioned_entry(self) -> None:
+        md = """## Entries
+
+## 2026-09-10 — Sectioned entry
+
+**What happened:** What happened.
+**Root cause:** Root cause.
+**Consequence:** Consequence.
+**The rule:** The rule.
+2026-09-15 - What happened | Root cause | Consequence | The rule
+"""
+        result = validate_mistakes_markdown(md)
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["entry_count"], 2)
+        self.assertEqual(result["style"], "mixed")
+        self.assertTrue(any("Mixed entry styles" in e["message"] for e in result["errors"]))
+        self.assertTrue(any("Out-of-order entry" in e["message"] for e in result["errors"]))
+
+    def test_rejects_malformed_date_in_both_entry_styles(self) -> None:
+        examples = {
+            "single-line": "2026-9-15 - What | Cause | Consequence | Rule",
+            "sectioned": "## 2026-9-15 — Malformed date\n\n**What happened:** What.",
+        }
+        for style, entry in examples.items():
+            with self.subTest(style=style):
+                result = validate_mistakes_markdown(f"## Entries\n{entry}\n")
+                self.assertFalse(result["valid"])
+                self.assertEqual(result["entry_count"], 1)
+                self.assertTrue(any('Invalid calendar date "2026-9-15"' in e["message"] for e in result["errors"]))
+
     def test_rejects_out_of_order_dates(self) -> None:
         md = """## Entries
 2026-08-01 - Older | Cause | Consequence | Rule
