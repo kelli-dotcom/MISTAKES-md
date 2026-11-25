@@ -1,7 +1,15 @@
+<p align="center">
+  <a href="https://kelli-dotcom.github.io/MISTAKES-md/preview/">
+    <img src="demo/hero-banner.svg" alt="MISTAKES.md — A Memory of Failure for AI Agents and Their Humans" width="100%" />
+  </a>
+</p>
+
 # MISTAKES.md
 
 > **A memory of failure, for AI agents and their humans.**  
 > Agents read it before acting. Humans update it when they err.
+
+**Live Demo:** [Open the Mistake & Guardrail Builder →](https://kelli-dotcom.github.io/MISTAKES-md/preview/)
 
 ---
 
